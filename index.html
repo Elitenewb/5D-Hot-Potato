@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>R.I.S.E.</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <h1>R.I.S.E.</h1>
+    <audio
+      id="audioPlayer"
+      src="assets/Rise Up Phoenixes — DJ Club Anthem Edit.mp3"
+    ></audio>
+    <!-- Replace YOUR_MP3_URL_HERE with the URL of your MP3 -->
+    <img
+      id="placeholder"
+      src="assets/phoenixPLACE.png"
+      style="display: block"
+      width="300"
+    />
+    <!-- Add your placeholder image here -->
+    <img
+      id="playingGif"
+      src="assets/phoenixPLAY.gif"
+      style="display: none"
+      width="300"
+    />
+    <!-- Replace src with your playing gif -->
+    <img
+      id="pausedGif"
+      src="assets/phoenixPAUSE.gif"
+      style="display: none"
+      width="300"
+    />
+    <!-- Replace src with your paused gif -->
+    <button id="controlButton" onclick="toggleCycle()">Start</button>
+    <script src="script.js"></script>
+  </body>
+</html>

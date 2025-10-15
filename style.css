@@ -1,0 +1,29 @@
+/* style.css */
+body {
+  text-align: center; /* Centers text-based content */
+  font-family: "Arial", sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+  display: flex; /* Using Flexbox */
+  flex-direction: column; /* Aligns children elements vertically */
+  align-items: center; /* Centers children elements horizontally */
+  min-height: 100vh; /* Minimum height of the viewport */
+  justify-content: center; /* Centers content vertically */
+}
+
+h1 {
+  color: #333;
+  margin-top: 0; /* Removes the default margin */
+}
+
+img {
+  display: block; /* Ensures the image is treated as a block-level element */
+  margin: 20px 0; /* Adds vertical spacing and ensures horizontal centering */
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
