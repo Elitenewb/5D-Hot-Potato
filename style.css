@@ -1,25 +1,35 @@
-/* style.css */
 body {
-  text-align: center; /* Centers text-based content */
   font-family: "Arial", sans-serif;
   background-color: #f0f0f0;
   margin: 0;
   padding: 20px;
-  display: flex; /* Using Flexbox */
-  flex-direction: column; /* Aligns children elements vertically */
-  align-items: center; /* Centers children elements horizontally */
-  min-height: 100vh; /* Minimum height of the viewport */
-  justify-content: center; /* Centers content vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  justify-content: center;
 }
 
 h1 {
   color: #333;
-  margin-top: 0; /* Removes the default margin */
+  margin-top: 0;
 }
 
 img {
-  display: block; /* Ensures the image is treated as a block-level element */
-  margin: 20px 0; /* Adds vertical spacing and ensures horizontal centering */
+  display: block;
+  margin: 20px 0;
+}
+
+#placeholder {
+  display: block;
+}
+
+#playingGif {
+  display: none;
+}
+
+#pausedGif {
+  display: none;
 }
 
 button {

@@ -1,74 +1,144 @@
-let audioPlayer = document.getElementById("audioPlayer");
-let playingGif = document.getElementById("playingGif");
-let pausedGif = document.getElementById("pausedGif");
-let placeholder = document.getElementById("placeholder");
-let controlButton = document.getElementById("controlButton");
-let isPlaying = false;
-let timeout;
-let cycleActive = false;
+(function() {
+  'use strict';
 
-function toggleCycle() {
-  if (cycleActive) {
+  const audioPlayer = document.getElementById("audioPlayer");
+  const playingGif = document.getElementById("playingGif");
+  const pausedGif = document.getElementById("pausedGif");
+  const placeholder = document.getElementById("placeholder");
+  const controlButton = document.getElementById("controlButton");
+  
+  let isPlaying = false;
+  let timeout = null;
+  let cycleActive = false;
+
+  // Add error handling for audio
+  audioPlayer.addEventListener('error', (e) => {
+    console.error('Audio error:', e);
     stopCycle();
-    controlButton.innerText = "Start";
-  } else {
-    startCycle();
-    controlButton.innerText = "Stop";
+    alert('Error loading audio. Please check the file path.');
+  });
+
+  // Wait for DOM to be ready
+  function init() {
+    controlButton.addEventListener('click', toggleCycle);
+    
+    // Add cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (cycleActive) {
+        clearTimeout(timeout);
+        audioPlayer.pause();
+      }
+    });
   }
-}
 
-function startCycle() {
-  cycleActive = true;
-  placeholder.style.display = "none"; // Hide the placeholder when cycle starts
-  togglePlayPause();
-}
+  function toggleCycle() {
+    if (cycleActive) {
+      stopCycle();
+      controlButton.innerText = "Start";
+    } else {
+      startCycle();
+      controlButton.innerText = "Stop";
+    }
+  }
 
-function stopCycle() {
-  clearTimeout(timeout);
-  audioPlayer.pause();
-  isPlaying = false;
-  cycleActive = false;
-  updateGifDisplay();
-  placeholder.style.display = "block"; // Show the placeholder when cycle stops
-}
+  function startCycle() {
+    cycleActive = true;
+    placeholder.style.display = "none";
+    togglePlayPause();
+  }
 
-function togglePlayPause() {
-  if (isPlaying) {
+  function stopCycle() {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
     audioPlayer.pause();
-    pausedGif.style.display = "block";
+    isPlaying = false;
+    cycleActive = false;
+    
+    // Inline the updateGifDisplay logic
     playingGif.style.display = "none";
-    scheduleNextToggle(5000); // Pauses for a constant 5 seconds before playing again
+    pausedGif.style.display = "none";
+    placeholder.style.display = "block";
+  }
+
+  function togglePlayPause() {
+    if (isPlaying) {
+      audioPlayer.pause();
+      pausedGif.style.display = "block";
+      playingGif.style.display = "none";
+      isPlaying = false;
+      scheduleNextToggle(5000);
+    } else {
+      // Check if audio is ready before playing
+      if (audioPlayer.readyState >= 2) {
+        const playPromise = audioPlayer.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              isPlaying = true;
+              playingGif.style.display = "block";
+              pausedGif.style.display = "none";
+              scheduleNextToggle(randomPlayTime());
+            })
+            .catch((error) => {
+              console.error('Playback failed:', error);
+              // Autoplay was prevented or other error
+              stopCycle();
+              controlButton.innerText = "Start";
+              alert('Audio playback failed. Please click Start again.');
+            });
+        } else {
+          // Fallback for older browsers
+          isPlaying = true;
+          playingGif.style.display = "block";
+          pausedGif.style.display = "none";
+          scheduleNextToggle(randomPlayTime());
+        }
+      } else {
+        // Audio not ready, wait for it
+        audioPlayer.addEventListener('canplay', function onCanPlay() {
+          audioPlayer.removeEventListener('canplay', onCanPlay);
+          togglePlayPause();
+        }, { once: true });
+        return;
+      }
+    }
+  }
+
+  function scheduleNextToggle(delay) {
+    if (cycleActive) {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(togglePlayPause, delay);
+    }
+  }
+
+  function randomPlayTime() {
+    // Random time between 5 (5000 ms) and 19.999 (19999 ms) seconds
+    return Math.floor(Math.random() * 15000) + 5000;
+  }
+
+  // Improved audio ended handler
+  audioPlayer.addEventListener('ended', () => {
+    isPlaying = false;
+    cycleActive = false;
+    controlButton.innerText = "Start";
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    playingGif.style.display = "none";
+    pausedGif.style.display = "none";
+    placeholder.style.display = "block";
+  });
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    audioPlayer.play();
-    playingGif.style.display = "block";
-    pausedGif.style.display = "none";
-    scheduleNextToggle(randomPlayTime());
+    init();
   }
-  isPlaying = !isPlaying;
-}
-
-function scheduleNextToggle(delay) {
-  if (cycleActive) {
-    timeout = setTimeout(togglePlayPause, delay);
-  }
-}
-
-function randomPlayTime() {
-  return Math.floor(Math.random() * 15000) + 5000; // Random time between 5 (5000 ms) and 20 (20000 ms) seconds
-}
-
-function updateGifDisplay() {
-  if (!isPlaying && !cycleActive) {
-    playingGif.style.display = "none";
-    pausedGif.style.display = "none";
-    placeholder.style.display = "block"; // Ensure placeholder is shown when not active
-  }
-}
-
-audioPlayer.onended = () => {
-  isPlaying = false;
-  cycleActive = false;
-  controlButton.innerText = "Start";
-  clearTimeout(timeout);
-  updateGifDisplay();
-};
+})();
